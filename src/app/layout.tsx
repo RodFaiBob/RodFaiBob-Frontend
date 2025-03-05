@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Poppins } from "next/font/google";
-import { IBM_Plex_Sans_Thai } from "next/font/google";
+import { IBM_Plex_Sans_Thai ,Poppins ,Poetsen_One } from "next/font/google";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -16,6 +14,15 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   weight: ["300", "400", "500", "600", "700"], // Choose the required weights
 });
 
+const poetsenOne = Poetsen_One({
+  variable: "--font-poetsen-one",
+  subsets: ["latin"],
+  weight: [ "400"],
+});
+
+
+
+
 export const metadata: Metadata = {
   title: "RodFaiBob",
   description: "RodFaiBob-AI",
@@ -29,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} ${ibmPlexSansThai.variable}  antialiased`}
+        className={`${poppins.variable} ${ibmPlexSansThai.variable} ${poetsenOne.variable} antialiased`}
       >
         {children}
       </body>

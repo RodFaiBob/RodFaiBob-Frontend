@@ -5,4 +5,10 @@
   .font-thai {
     font-family: var(--font-ibm-plex-thai), sans-serif;
   }
+
+  .font-logo {
+    font-family: var(--font-poetsen-one) , sans-serif;
+  }
 }
+
+
