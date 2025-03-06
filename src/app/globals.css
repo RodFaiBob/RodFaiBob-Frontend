@@ -9,6 +9,9 @@
   .font-logo {
     font-family: var(--font-poetsen-one) , sans-serif;
   }
+  .font-pop {
+    font-family: var(--font-poppins), sans-serif;
+  }
 }
 
 body {
