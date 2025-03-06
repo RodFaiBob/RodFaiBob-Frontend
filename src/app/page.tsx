@@ -1,14 +1,10 @@
-import Image from "next/image";
-import { HomeBackground } from "@/components/Background";
-import { Navbar } from "@/components/common";
+import Homepage from "@/modules/home/homepage";
 
 
 export default function Home() {
   return (
     <div>
-      <Navbar />
-
-      <HomeBackground />
+      <Homepage/>
     </div>
   );
 }
