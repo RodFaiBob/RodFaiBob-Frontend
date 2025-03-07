@@ -9,12 +9,10 @@
   .font-logo {
     font-family: var(--font-poetsen-one) , sans-serif;
   }
-  .font-pop {
-    font-family: var(--font-poppins), sans-serif;
-  }
 }
 
 body {
   background-color: #F8F7FF;
+  font-family: var(--font-poppins), sans-serif;
 }
 
