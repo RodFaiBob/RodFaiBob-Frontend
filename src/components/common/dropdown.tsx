@@ -16,9 +16,9 @@ type LineProps = LineType & {
 
 const Line = ({ colorCode, lineNameThai, lineNameEng, onClick, showDropdown = false }: LineProps) => {
   return (
-    <div className="flex items-center justify-between p-2 pl-3 pr-3 w-75 h-17 hover:bg-[#F1F0FF] cursor-pointer" onClick={onClick}>
+    <div className="flex items-center justify-between p-2 pl-3 pr-3 w-80 h-17 hover:bg-[#F1F0FF] cursor-pointer" onClick={onClick}>
       <div className='flex items-center'>
-        <div className="w-[6px] h-14 rounded-[5px]" style={{ backgroundColor: colorCode }}></div>
+        <div className="w-[6px] h-13 rounded-[5px]" style={{ backgroundColor: colorCode }}></div>
         <div className="flex flex-col ml-2">
           <span className="font-thai font-semibold text-[16px] ">{lineNameThai}</span>
           <span className="font-medium text-[14px]">{lineNameEng}</span>
@@ -47,7 +47,7 @@ const LineList = ({ onSelectLine }: { onSelectLine: (line: LineType) => void }) 
     { colorCode: "#991A17", lineNameThai: "สายสีแดง", lineNameEng: "Red LineCommuter Train" },
   ];
   return (
-    <div className="flex flex-col items-center overflow-y-scroll h-60 w-80 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
+    <div className="flex flex-col items-center overflow-y-scroll h-60 w-85 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
       {lines.map((line, index) => (
         <Line
           key={index}
@@ -72,7 +72,7 @@ const StationPoint = ({
   onClick,
 }: StationProps) => {
   return (
-    <div className="flex items-center p-2 pl-3 pr-3 w-75 h-14 gap-2 hover:bg-[#F1F0FF] cursor-pointer" onClick={onClick}>
+    <div className="flex items-center p-2 pl-3 pr-3 w-80 h-14 gap-2 hover:bg-[#F1F0FF] cursor-pointer" onClick={onClick}>
       <div
         className={`flex justify-center items-center w-10 h-10 border-4 rounded-full m-1`}
         style={{ borderColor: colorCode }}
@@ -98,14 +98,14 @@ const StationList = ({ line, onSelectLine, setSelectedStation,setIsOpen}
   ];
 
   return (
-    <div className="flex flex-col items-center h-60 w-80 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
+    <div className="flex flex-col items-center h-60 w-85 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
       <Line
         colorCode={line.colorCode}
         lineNameThai={line.lineNameThai}
         lineNameEng={line.lineNameEng}
         onClick={onSelectLine}
         showDropdown={true}></Line>
-      <div className="w-70 h-[2px] bg-[#CDCDCD]"></div>
+      <div className="w-75 h-[2px] bg-[#CDCDCD]"></div>
       <div className='flex flex-col items-center overflow-y-scroll h-fit w-full '>
         {mock_stations.map((station, index) => (
           <StationPoint
@@ -165,10 +165,10 @@ const Dropdown = ({
     >
       <button
         onClick={toggleDropdown}
-        className="flex items-center justify-between w-80 h-12 p-2.5 pl-4 pr-5  border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF] hover:cursor-pointer"
+        className="flex items-center justify-between w-85 h-12 p-2.5 pl-4 pr-5  border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF] hover:cursor-pointer"
       >
         {selectedStation ? (
-          <div className="flex items-center w-75 gap-2">
+          <div className="flex items-center w-80 gap-2">
             <div
               className={`flex justify-center items-center w-8 h-8 border-4 rounded-full m-1`}
               style={{ borderColor: selectedStation.colorCode }}
