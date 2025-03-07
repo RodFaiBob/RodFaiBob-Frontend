@@ -27,7 +27,7 @@ const Homepage = () => {
   return (
     <div className='min-h-screen w-full'>
       <div
-        className={`w-full h-100 flex justify-center flex-col space-y-4 items-center gap-4`}
+        className={`w-full h-120 flex justify-center flex-col space-y-4 items-center gap-4`}
         style={{
           backgroundImage: `url('/assets/home/BackgroundRodFai.svg')`,
           backgroundSize: "cover",
