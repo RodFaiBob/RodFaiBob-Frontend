@@ -1,4 +1,5 @@
-export type option = {
-   'label': string,
-   'value':string 
-}
+export type StationType = {
+   stnName: string;
+   stnCode: string;
+   colorCode: string;
+ };
