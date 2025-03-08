@@ -182,14 +182,14 @@ const VisualizePage = () => {
     <div className="min-h-screen flex flex-col bg-white">
       <div className="w-full bg-[#F1F0FF]  relative">
         <button
-          className="flex cursor-pointer gap-1 absolute left-4 top-10 transform -translate-y-1/2 text-2xl font-bold"
-          onClick={() => router.replace('/')}
+          className="flex cursor-pointer gap-1 absolute left-4 top-10 transform -translate-y-1/2 text-[24px] font-bold"
+          onClick={() => router.replace("/")}
         >
           <Image src="/assets/back.svg" width={30} height={30} alt="back" />
           Back
         </button>
 
-        <h1 className="text-5xl font-extrabold text-center p-10">
+        <h1 className="font-extrabold text-[40px] text-center p-6">
           Compare Search Strategies
         </h1>
       </div>
@@ -200,7 +200,7 @@ const VisualizePage = () => {
         <SearchCard title="Heuristic Search" />
       </div>
       <div className="w-full flex justify-center">
-        <button className="w-90 cursor-pointer flex justify-center gap-5 bg-[#F5C2C2] text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10">
+        <button className="w-100 cursor-pointer flex justify-center gap-5 bg-[#F5C2C2] text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10">
           <Image src="/assets/start.svg" width={15} height={20} alt="start" />
           Start Animation
         </button>
