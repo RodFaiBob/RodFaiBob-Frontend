@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
     baseURL: 'https://rodfaibob-backend.micromew.com', // Replace with your default domain
-    timeout: 300000,
+    timeout: 30000000,
     headers: { 'Content-Type': 'application/json' }
 });
 
