@@ -4,11 +4,11 @@ import Image from "next/image";
 import React from "react";
 import { useState } from "react";
 import { StationType } from "./types";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/utils/Axios";
+// import axiosInstance from "@/utils/Axios";
 
 const Homepage = () => {
   const router = useRouter();
@@ -37,24 +37,25 @@ const Homepage = () => {
     setLoading(true);
 
     toast.loading("Generating data, please wait...", {
-      style: { fontSize: '18px' }
+      style: { fontSize: "18px" },
     });
 
     try {
-      axiosInstance.get(
-        `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      );
-      axiosInstance.get(
-        `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      );
-
+      // axiosInstance.get(
+      //   `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      // );
+      // axiosInstance.get(
+      //   `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      // );
 
       toast.success("Data generated successfully!", {
-        style: { fontSize: '18px' }
+        style: { fontSize: "18px" },
       });
       toast.dismiss();
 
-      router.push(`/visualize?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`);
+      router.push(
+        `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
+      );
     } catch (error) {
       toast.dismiss();
       toast.error("Failed to generate data.");
@@ -107,20 +108,26 @@ const Homepage = () => {
         </div>
         <button
           onClick={searchSubmit}
-          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           disabled={loading}
         >
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
       <div
-        className={`w-full ${isFullScreen ? 'fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center' : 'h-[1100px] flex items-center justify-center'}`}
+        className={`w-full ${
+          isFullScreen
+            ? "fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
+            : "h-[1100px] flex items-center justify-center"
+        }`}
         onClick={toggleFullScreen}
       >
         <Image
           src={TrainMap}
           alt="TrainMap"
-          className={isFullScreen ? 'w-full h-full object-contain' : ''}
+          className={isFullScreen ? "w-full h-full object-contain" : ""}
         />
       </div>
     </div>
