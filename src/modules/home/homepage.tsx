@@ -21,10 +21,15 @@ const Homepage = () => {
   const [originStation, setOriginStation] = useState<StationType | null>(null);
   const [destinationStation, setDestinationStation] =
     useState<StationType | null>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const handleSwitch = () => {
     setOriginStation(destinationStation);
     setDestinationStation(originStation);
+  };
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
   };
 
   return (
@@ -75,8 +80,15 @@ const Homepage = () => {
           Search
         </button>
       </div>
-      <div className="w-full h-[1100px] flex items-center justify-center">
-        <Image src={TrainMap} alt="TrainMap" />
+      <div 
+        className={`w-full ${isFullScreen ? 'fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center' : 'h-[1100px] flex items-center justify-center'}`}
+        onClick={toggleFullScreen}
+      >
+        <Image 
+          src={TrainMap} 
+          alt="TrainMap" 
+          className={isFullScreen ? 'w-full h-full object-contain' : ''}
+        />
       </div>
     </div>
   );
