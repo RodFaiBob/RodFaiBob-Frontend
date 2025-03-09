@@ -28,14 +28,6 @@ const Homepage = () => {
     setDestinationStation(originStation);
   };
 
-  useEffect(() => {
-    axiosInstance.get("/").then(response => {
-
-    }).catch(error => {
-      console.error("There was an error fetching the data:", error);
-    });
-  }, []);
-
   return (
     <div className="min-h-screen w-full">
       <div
