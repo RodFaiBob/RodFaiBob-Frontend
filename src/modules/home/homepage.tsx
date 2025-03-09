@@ -1,12 +1,13 @@
 "use client";
 import Dropdown from "@/components/common/dropdown";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { StationType } from "./types";
 
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/utils/Axios";
 
 // const mockData = [
 //   {
@@ -26,6 +27,14 @@ const Homepage = () => {
     setOriginStation(destinationStation);
     setDestinationStation(originStation);
   };
+
+  useEffect(() => {
+    axiosInstance.get("/").then(response => {
+
+    }).catch(error => {
+      console.error("There was an error fetching the data:", error);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen w-full">
