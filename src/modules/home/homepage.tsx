@@ -41,14 +41,13 @@ const Homepage = () => {
     });
 
     try {
-      await Promise.all([
-        axiosInstance.get(
-          `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-        ),
-        axiosInstance.get(
-          `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-        ),
-      ]);
+      axiosInstance.get(
+        `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      )
+      axiosInstance.get(
+        `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      )
+
 
       toast.success("Data generated successfully!", {
         style: { fontSize: '18px' }
