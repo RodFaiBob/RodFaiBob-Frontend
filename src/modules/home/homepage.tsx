@@ -1,7 +1,7 @@
 "use client";
 import Dropdown from "@/components/common/dropdown";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { StationType } from "./types";
 import { toast } from 'react-hot-toast';
@@ -36,7 +36,7 @@ const Homepage = () => {
 
     setLoading(true);
 
-    const loadingToast = toast.loading("Generating data, please wait...", {
+    toast.loading("Generating data, please wait...", {
       style: { fontSize: '18px' }
     });
 
