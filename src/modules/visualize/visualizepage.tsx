@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -174,7 +174,15 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
   );
 };
 
-const SearchCard = ({ title, data }: { title: string; data: Data }) => {
+const SearchCard = ({
+  title,
+  data,
+  videoSrc,
+}: {
+  title: string;
+  data: Data;
+  videoSrc: string;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="relative w-1/2 bg-white p-10 rounded-lg">
@@ -182,6 +190,14 @@ const SearchCard = ({ title, data }: { title: string; data: Data }) => {
         {title}
       </h2>
       <div className="w-full h-100 bg-[#F1F0FF] rounded-lg mt-4">
+        {videoSrc ? (
+          <video controls loop className="w-full h-full">
+            <source src={videoSrc} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <p>Loading video...</p>
+        )}
         {isOpen && <Modal data={data} onClose={() => setIsOpen(false)} />}
       </div>
       <div className="flex justify-evenly mt-4 font-semibold text-[16px]">
@@ -222,27 +238,48 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
   const [blindData, setBlindData] = useState<Data>();
   const [heuristicData, setHeuristicData] = useState<Data>();
+  const [blindVideoSrc, setBlindVideoSrc] = useState<string>();
+  const [heuristicVideoSrc, setHeuristicVideoSrc] = useState<string>();
 
-  function fetchBlindData(origin: string, destination: string) {
-    axiosInstance
-      .get(`/blind/?start=${origin}&goal=${destination}`)
-      .then((res) => {
-        setBlindData(res.data);
-        console.log(res.data);
-      });
-  }
-  function fetchHeuristicData(origin: string, destination: string) {
-    axiosInstance
-      .get(`/heuristic/?start=${origin}&goal=${destination}`)
-      .then((res) => {
-        setHeuristicData(res.data);
-        console.log(res.data);
-      });
-  }
+  const fetchData = useCallback(async () => {
+    try {
+      const [blindRes, heuristicRes, blindVideoRes, heuristicVideoRes] =
+        await Promise.all([
+          axiosInstance.get(`/blind/?start=${origin}&goal=${destination}`),
+          axiosInstance.get(`/heuristic/?start=${origin}&goal=${destination}`),
+          axiosInstance.get(
+            `/video/blind/?start=${origin}&goal=${destination}`,
+            { responseType: "blob" }
+          ),
+          axiosInstance.get(
+            `/video/heuristic/?start=${origin}&goal=${destination}`,
+            { responseType: "blob" }
+          ),
+        ]);
+
+      setBlindData(blindRes.data);
+      setHeuristicData(heuristicRes.data);
+
+      setBlindVideoSrc(
+        URL.createObjectURL(
+          new Blob([blindVideoRes.data], { type: "video/mp4" })
+        )
+      );
+      setHeuristicVideoSrc(
+        URL.createObjectURL(
+          new Blob([heuristicVideoRes.data], { type: "video/mp4" })
+        )
+      );
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }, [origin, destination]);
+
   useEffect(() => {
-    fetchHeuristicData(origin, destination);
-    fetchBlindData(origin, destination);
-  }, [destination, origin]);
+    if (origin && destination) {
+      fetchData();
+    }
+  }, [origin, destination, fetchData]);
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <div className="w-full bg-[#F1F0FF]  relative">
@@ -260,10 +297,20 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       </div>
 
       <div className="w-full bg-white flex justify-center gap-10 px-10">
-        {blindData && <SearchCard title="Blind Search" data={blindData} />}
+        {blindData && (
+          <SearchCard
+            title="Blind Search"
+            data={blindData}
+            videoSrc={heuristicVideoSrc || ""}
+          />
+        )}
         <div className="w-px my-3 bg-[#708C82]"></div>
         {heuristicData && (
-          <SearchCard title="Heuristic Search" data={heuristicData} />
+          <SearchCard
+            title="Heuristic Search"
+            data={heuristicData}
+            videoSrc={blindVideoSrc || ""}
+          />
         )}
       </div>
       <div className="w-full flex justify-center">

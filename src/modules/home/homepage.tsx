@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
-// import axiosInstance from "@/utils/Axios";
+import axiosInstance from "@/utils/Axios";
 
 const Homepage = () => {
   const router = useRouter();
@@ -41,12 +41,12 @@ const Homepage = () => {
     });
 
     try {
-      // axiosInstance.get(
-      //   `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      // );
-      // axiosInstance.get(
-      //   `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      // );
+      axiosInstance.get(
+        `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
+      axiosInstance.get(
+        `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
 
       toast.success("Data generated successfully!", {
         style: { fontSize: "18px" },
