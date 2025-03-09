@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai ,Poppins ,Poetsen_One } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/common";
+import { Toaster } from 'react-hot-toast';
+
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -41,6 +43,7 @@ export default function RootLayout({
 
         className={`${poppins.variable} ${ibmPlexSansThai.variable} ${poetsenOne.variable} antialiased`}
       >
+        <Toaster position="top-right" />
         <Navbar />
         {children}
       </body>

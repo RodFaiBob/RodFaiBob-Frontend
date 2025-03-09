@@ -4,17 +4,11 @@ import Image from "next/image";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { StationType } from "./types";
+import { toast } from 'react-hot-toast';
 
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/utils/Axios";
-
-// const mockData = [
-//   {
-//     label: "test",
-//     value: "test1"
-
-//   }]
 
 const Homepage = () => {
   const router = useRouter();
@@ -23,6 +17,7 @@ const Homepage = () => {
   const [destinationStation, setDestinationStation] =
     useState<StationType | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSwitch = () => {
     setOriginStation(destinationStation);
@@ -35,29 +30,40 @@ const Homepage = () => {
 
   const searchSubmit = async () => {
     if (!originStation || !destinationStation) {
-      console.error("Origin or destination station not selected.");
+      toast.error("Please select both origin and destination stations.");
       return;
     }
-  
+
+    setLoading(true);
+
+    const loadingToast = toast.loading("Generating data, please wait...", {
+      style: { fontSize: '18px' }
+    });
+
     try {
-      const heuristicResponse = await axiosInstance.get(
-        `/heuristic?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      );
-  
-      const blindResponse = await axiosInstance.get(
-        `/blind?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      );
-  
-      console.log("Heuristic Response:", heuristicResponse.data);
-      console.log("Blind Response:", blindResponse.data);
-  
-      // Navigate after successful requests
-      // router.push(`/visualize`);
+      await Promise.all([
+        axiosInstance.get(
+          `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+        ),
+        axiosInstance.get(
+          `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+        ),
+      ]);
+
+      toast.success("Data generated successfully!", {
+        style: { fontSize: '18px' }
+      });
+      toast.dismiss();
+
+      router.push(`/visualize?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`);
     } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to generate data.");
       console.error("API request failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   return (
     <div className="min-h-screen w-full">
@@ -101,19 +107,20 @@ const Homepage = () => {
           />
         </div>
         <button
-          className="p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-bold text-[#F8F7FF] tracking-wider hover:bg-[#588474] cursor-pointer"
           onClick={searchSubmit}
+          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
         >
-          Search
+          {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      <div 
+      <div
         className={`w-full ${isFullScreen ? 'fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center' : 'h-[1100px] flex items-center justify-center'}`}
         onClick={toggleFullScreen}
       >
-        <Image 
-          src={TrainMap} 
-          alt="TrainMap" 
+        <Image
+          src={TrainMap}
+          alt="TrainMap"
           className={isFullScreen ? 'w-full h-full object-contain' : ''}
         />
       </div>
