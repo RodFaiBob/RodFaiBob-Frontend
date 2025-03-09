@@ -33,6 +33,32 @@ const Homepage = () => {
     setIsFullScreen(!isFullScreen);
   };
 
+  const searchSubmit = async () => {
+    if (!originStation || !destinationStation) {
+      console.error("Origin or destination station not selected.");
+      return;
+    }
+  
+    try {
+      const heuristicResponse = await axiosInstance.get(
+        `/heuristic?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
+  
+      const blindResponse = await axiosInstance.get(
+        `/blind?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
+  
+      console.log("Heuristic Response:", heuristicResponse.data);
+      console.log("Blind Response:", blindResponse.data);
+  
+      // Navigate after successful requests
+      // router.push(`/visualize`);
+    } catch (error) {
+      console.error("API request failed:", error);
+    }
+  };
+  
+
   return (
     <div className="min-h-screen w-full">
       <div
@@ -76,7 +102,7 @@ const Homepage = () => {
         </div>
         <button
           className="p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-bold text-[#F8F7FF] tracking-wider hover:bg-[#588474] cursor-pointer"
-          onClick={() => router.push(`/visualize`)}
+          onClick={searchSubmit}
         >
           Search
         </button>
