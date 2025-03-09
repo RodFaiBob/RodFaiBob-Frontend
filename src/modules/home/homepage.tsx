@@ -43,10 +43,10 @@ const Homepage = () => {
     try {
       axiosInstance.get(
         `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      )
+      );
       axiosInstance.get(
         `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-      )
+      );
 
 
       toast.success("Data generated successfully!", {
