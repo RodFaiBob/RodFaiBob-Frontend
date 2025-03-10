@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/utils/Axios";
 import stations from "@/constant/stations";
+import { toast } from "react-hot-toast";
+
 
 const InterchangePoint = ({
   stnName,
@@ -195,7 +197,7 @@ const SearchCard = ({
       </h2>
       <div className="w-full h-100 bg-[#F1F0FF] rounded-lg mt-4">
         {videoSrc ? (
-          <video ref={videoRef} loop className="w-full h-full">
+          <video ref={videoRef} className="w-full h-full">
             <source src={videoSrc} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -248,8 +250,17 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
   const blindVideoRef = useRef<HTMLVideoElement>(null!);
   const heuristicVideoRef = useRef<HTMLVideoElement>(null!);
 
+  const [isBlindVideoReady, setIsBlindVideoReady] = useState(false);
+  const [isHeuristicVideoReady, setIsHeuristicVideoReady] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+
+
+
   const fetchData = useCallback(async () => {
     try {
+
       const [blindRes, heuristicRes, blindVideoRes, heuristicVideoRes] =
         await Promise.all([
           axiosInstance.get(`/blind/?start=${origin}&goal=${destination}`),
@@ -267,31 +278,139 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       setBlindData(blindRes.data);
       setHeuristicData(heuristicRes.data);
 
-      setBlindVideoSrc(
-        URL.createObjectURL(
-          new Blob([blindVideoRes.data], { type: "video/mp4" })
-        )
-      );
-      setHeuristicVideoSrc(
-        URL.createObjectURL(
-          new Blob([heuristicVideoRes.data], { type: "video/mp4" })
-        )
-      );
+
+      try {
+        const blindVideoURL = await createVideoURL(blindVideoRes.data);
+        setBlindVideoSrc(blindVideoURL);
+        setIsBlindVideoReady(true);
+      } catch (error) {
+        console.error("Blind video failed to load:", error);
+      }
+
+      try {
+        const heuristicVideoURL = await createVideoURL(heuristicVideoRes.data);
+        setHeuristicVideoSrc(heuristicVideoURL);
+        setIsHeuristicVideoReady(true);
+      } catch (error) {
+        console.error("Heuristic video failed to load:", error);
+      }
+
     } catch (err) {
       console.error("Error fetching data:", err);
     }
   }, [origin, destination]);
 
+
+
+  const createVideoURL = (blobData: BlobPart) => {
+    return new Promise<string>((resolve, reject) => {
+      const blobURL = URL.createObjectURL(new Blob([blobData], { type: "video/mp4" }));
+      const video = document.createElement("video");
+
+      video.preload = "metadata"; // Load metadata without fully loading the video
+      video.src = blobURL;
+
+      video.onloadedmetadata = () => {
+        resolve(blobURL); // Video is confirmed playable
+      };
+
+      video.onerror = () => {
+        reject(new Error("Video cannot be played"));
+      };
+
+      // Load the video by appending it to the DOM temporarily (avoiding issues with memory leaks)
+      document.body.appendChild(video);
+      video.load();
+
+      // Remove the video element after testing
+      setTimeout(() => {
+        document.body.removeChild(video);
+      }, 1000);
+    });
+  };
+
+
   useEffect(() => {
     if (origin && destination) {
       fetchData();
+
     }
+
   }, [origin, destination, fetchData]);
 
+  const reloadAnimation = async () => {
+    setIsReloading(true);
+    setIsPlaying(false);
+
+    setIsBlindVideoReady(false);
+    setIsHeuristicVideoReady(false);
+
+    toast.loading("Loading data, please wait...", {
+      style: { fontSize: "18px" },
+    });
+    if (blindVideoRef.current) {
+      blindVideoRef.current.pause();
+      blindVideoRef.current.currentTime = 0; // Reset to beginning
+    }
+
+    if (heuristicVideoRef.current) {
+      heuristicVideoRef.current.pause();
+      heuristicVideoRef.current.currentTime = 0; // Reset to beginning
+    }
+
+
+    try {
+      const [blindVideoRes, heuristicVideoRes] = await Promise.all([
+        axiosInstance.get(`/video/blind/?start=${origin}&goal=${destination}`, {
+          responseType: "blob",
+        }),
+        axiosInstance.get(`/video/heuristic/?start=${origin}&goal=${destination}`, {
+          responseType: "blob",
+        }),
+      ]);
+
+
+      try {
+        const blindVideoURL = await createVideoURL(blindVideoRes.data);
+        setBlindVideoSrc(blindVideoURL);
+        setIsBlindVideoReady(true);
+      } catch (error) {
+        console.error("Blind video failed to load:", error);
+      }
+
+      try {
+        const heuristicVideoURL = await createVideoURL(heuristicVideoRes.data);
+        setHeuristicVideoSrc(heuristicVideoURL);
+        setIsHeuristicVideoReady(true);
+      } catch (error) {
+        console.error("Heuristic video failed to load:", error);
+      }
+
+
+      toast.dismiss();
+      toast.success("Animation reloaded successfully!");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to reload animation!");
+    } finally {
+      setIsReloading(false);
+    }
+  };
+
   const handleStartAnimation = () => {
+    if (!isBlindVideoReady || !isHeuristicVideoReady) {
+      toast.error("Please wait for videos to load before starting!");
+      return;
+    }
+
+    setIsPlaying(true);
+    toast.success("Animation started successfully!");
+
     if (blindVideoRef.current) blindVideoRef.current.play();
     if (heuristicVideoRef.current) heuristicVideoRef.current.play();
   };
+
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <div className="w-full bg-[#F1F0FF]  relative">
@@ -327,13 +446,29 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
           />
         )}
       </div>
-      <div className="w-full flex justify-center">
+      <div className="w-full flex justify-center gap-5">
         <button
-          className="w-100 cursor-pointer flex justify-center gap-5 bg-[#F5C2C2] text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10"
+          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${isReloading ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff9292]"
+            }`}
+          onClick={reloadAnimation}
+          disabled={isReloading}
+        >
+          <Image src="/assets/reload-white.svg" width={25} height={20} alt="reload" />
+          {isReloading ? "Reloading..." : "Reload Animation"}
+        </button>
+
+        <button
+          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${!isBlindVideoReady || !isHeuristicVideoReady || isReloading
+            ? "bg-gray-400 cursor-not-allowed"
+            : isPlaying
+              ? "bg-green-500"
+              : "bg-[#ff9292]"
+            }`}
           onClick={handleStartAnimation}
+          disabled={!isBlindVideoReady || !isHeuristicVideoReady || isReloading}
         >
           <Image src="/assets/start.svg" width={15} height={20} alt="start" />
-          Start Animation
+          {isPlaying ? "Animation Running" : "Start Animation"}
         </button>
       </div>
     </div>
