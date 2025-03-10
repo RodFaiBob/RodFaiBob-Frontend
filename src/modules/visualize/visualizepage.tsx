@@ -284,6 +284,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setBlindVideoSrc(blindVideoURL);
         setIsBlindVideoReady(true);
       } catch (error) {
+        toast.error("Blind video failed to load");
         console.error("Blind video failed to load:", error);
       }
 
@@ -292,7 +293,13 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setHeuristicVideoSrc(heuristicVideoURL);
         setIsHeuristicVideoReady(true);
       } catch (error) {
+        toast.error("Heuristic video failed to load");
         console.error("Heuristic video failed to load:", error);
+      }
+
+      if (isBlindVideoReady && isHeuristicVideoReady) {
+        toast.dismiss();
+        toast.success("Animation reloaded successfully!");
       }
 
     } catch (err) {
@@ -315,7 +322,8 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       };
 
       video.onerror = () => {
-        reject(new Error("Video cannot be played"));
+        
+        reject( new Error("Video cannot be played"));
       };
 
       // Load the video by appending it to the DOM temporarily (avoiding issues with memory leaks)
@@ -338,16 +346,26 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
   }, [origin, destination, fetchData]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Checking if videos are ready...");
+
+      if (isBlindVideoReady && isHeuristicVideoReady) {
+        console.log("Both videos are ready. Stopping interval.");
+        clearInterval(interval); // Stop interval when both are ready
+      }
+      else {
+        reloadAnimation()
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, [isBlindVideoReady, isHeuristicVideoReady]); // Dependency array
+
   const reloadAnimation = async () => {
     setIsReloading(true);
     setIsPlaying(false);
 
-    setIsBlindVideoReady(false);
-    setIsHeuristicVideoReady(false);
-
-    toast.loading("Loading data, please wait...", {
-      style: { fontSize: "18px" },
-    });
     if (blindVideoRef.current) {
       blindVideoRef.current.pause();
       blindVideoRef.current.currentTime = 0; // Reset to beginning
@@ -371,24 +389,31 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
 
       try {
-        const blindVideoURL = await createVideoURL(blindVideoRes.data);
-        setBlindVideoSrc(blindVideoURL);
-        setIsBlindVideoReady(true);
-      } catch (error) {
-        console.error("Blind video failed to load:", error);
-      }
-
-      try {
         const heuristicVideoURL = await createVideoURL(heuristicVideoRes.data);
         setHeuristicVideoSrc(heuristicVideoURL);
         setIsHeuristicVideoReady(true);
       } catch (error) {
+        toast.error("Heuristic video failed to load");
         console.error("Heuristic video failed to load:", error);
       }
 
 
-      toast.dismiss();
-      toast.success("Animation reloaded successfully!");
+
+      try {
+        const blindVideoURL = await createVideoURL(blindVideoRes.data);
+        setBlindVideoSrc(blindVideoURL);
+        setIsBlindVideoReady(true);
+      } catch (error) {
+        toast.error("Blind video failed to load");
+        console.error("Blind video failed to load:", error);
+      }
+
+      
+      
+      if (isBlindVideoReady && isHeuristicVideoReady) {
+        toast.dismiss();
+        toast.success("Animation reloaded successfully!");
+      }
     } catch {
       toast.dismiss();
       toast.error("Failed to reload animation!");
@@ -432,8 +457,9 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
           <SearchCard
             title="Blind Search"
             data={blindData}
-            videoSrc={heuristicVideoSrc || ""}
-            videoRef={heuristicVideoRef}
+            videoSrc={blindVideoSrc || ""}
+            videoRef={blindVideoRef}
+
           />
         )}
         <div className="w-px my-3 bg-[#708C82]"></div>
@@ -441,8 +467,9 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
           <SearchCard
             title="Heuristic Search"
             data={heuristicData}
-            videoSrc={blindVideoSrc || ""}
-            videoRef={blindVideoRef}
+            videoSrc={heuristicVideoSrc || ""}
+            videoRef={heuristicVideoRef}
+
           />
         )}
       </div>
