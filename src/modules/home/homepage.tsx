@@ -5,10 +5,54 @@ import React from "react";
 import { useState } from "react";
 import { StationType } from "./types";
 import { toast } from "react-hot-toast";
-
+import axiosInstance from "@/utils/Axios";
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/utils/Axios";
+
+import {
+  TransformWrapper,
+  TransformComponent,
+  useControls,
+} from "react-zoom-pan-pinch";
+
+const Controls = () => {
+  const { zoomIn, zoomOut } = useControls();
+
+  return (
+    <div className="flex flex-col items-center gap-4 w-fit ">
+      <div
+        onClick={() => zoomIn()}
+        className="cursor-pointer flex  w-full "
+      >
+        <Image
+          src="/assets/home/zoomin.png"
+          alt="zoomin"
+          width={48}
+          height={48}
+        />
+      </div>
+      <div
+        onClick={() => zoomOut()}
+        className="cursor-pointer flex  w-full"
+      >
+        <Image
+          src="/assets/home/zoomout.png"
+          alt="zoomout"
+          width={48}
+          height={48}
+        />
+      </div>
+    </div>
+  );
+};
+
+
+// const mockData = [
+//   {
+//     label: "test",
+//     value: "test1"
+
+//   }]
 
 const Homepage = () => {
   const router = useRouter();
@@ -16,7 +60,6 @@ const Homepage = () => {
   const [originStation, setOriginStation] = useState<StationType | null>(null);
   const [destinationStation, setDestinationStation] =
     useState<StationType | null>(null);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSwitch = () => {
@@ -24,9 +67,6 @@ const Homepage = () => {
     setDestinationStation(originStation);
   };
 
-  const toggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
-  };
 
   const searchSubmit = async () => {
     if (!originStation || !destinationStation) {
@@ -36,7 +76,7 @@ const Homepage = () => {
 
     setLoading(true);
 
-    
+
     try {
       axiosInstance.get(
         `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
@@ -108,18 +148,28 @@ const Homepage = () => {
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      <div
-        className={`w-full ${isFullScreen
-            ? "fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
-            : "h-[1100px] flex items-center justify-center"
-          }`}
-        onClick={toggleFullScreen}
-      >
-        <Image
-          src={TrainMap}
-          alt="TrainMap"
-          className={isFullScreen ? "w-full h-full object-contain" : ""}
-        />
+      <div className="relative w-full  ">
+        <TransformWrapper
+          initialScale={1}
+          initialPositionX={200}
+          initialPositionY={100}
+        >
+          {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+            < >
+              <div className="absolute left-1/2 top-6 transform -translate-x-1/2">
+                <TransformComponent>
+                  <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
+                </TransformComponent>
+              </div>
+
+              <div className="absolute right-20 top-20 ">
+                <Controls />
+
+              </div>
+            </>
+
+          )}
+        </TransformWrapper>
       </div>
     </div>
   );
