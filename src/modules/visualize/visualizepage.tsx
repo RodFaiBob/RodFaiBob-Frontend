@@ -389,7 +389,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
       toast.dismiss();
       toast.success("Animation reloaded successfully!");
-    } catch (error) {
+    } catch {
       toast.dismiss();
       toast.error("Failed to reload animation!");
     } finally {
