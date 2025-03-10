@@ -76,7 +76,7 @@ const Homepage = () => {
 
     setLoading(true);
 
-    
+
     try {
       axiosInstance.get(
         `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
@@ -148,7 +148,7 @@ const Homepage = () => {
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      <div className="relative w-full h-[134vh]">
+      <div className="relative w-full  ">
         <TransformWrapper
           initialScale={1}
           initialPositionX={200}
@@ -156,17 +156,18 @@ const Homepage = () => {
         >
           {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
             < >
-              <div className="absolute left-[18.5%] top-6 ">
+              <div className="absolute left-1/2 top-6 transform -translate-x-1/2">
                 <TransformComponent>
-                  <Image src={TrainMap} alt="map" className="w-full h-auto" />
+                  <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
                 </TransformComponent>
               </div>
+
               <div className="absolute right-20 top-20 ">
                 <Controls />
 
               </div>
             </>
- 
+
           )}
         </TransformWrapper>
       </div>
