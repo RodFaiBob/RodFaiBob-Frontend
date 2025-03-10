@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -87,7 +87,7 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
                     height={20}
                     alt="pin"
                   />
-                  <div className="text-[#CDCDCD]">Origin</div>
+                  <div className="font-semibold text-[#CDCDCD]">Origin</div>
                 </div>
                 <div>
                   <StationPoint
@@ -123,7 +123,9 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
                     height={20}
                     alt="pin"
                   />
-                  <div className="text-[#CDCDCD]">Destination</div>
+                  <div className="font-semibold text-[#CDCDCD]">
+                    Destination
+                  </div>
                 </div>
                 <div>
                   <StationPoint
@@ -165,8 +167,8 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
               </div>
             </div>
           </div>
-          <button className="w-full bg-[#F5C2C2] font-semibold text-xl py-2 rounded-2xl mt-2">
-            Fare : {data.cost} Bath
+          <button className="w-full bg-[#F5C2C2] text-[20px] font-bold  py-2 rounded-2xl mt-2">
+            <span className="font-semibold">Fare</span> : {data.cost} Bath
           </button>
         </div>
       </div>
@@ -178,10 +180,12 @@ const SearchCard = ({
   title,
   data,
   videoSrc,
+  videoRef,
 }: {
   title: string;
   data: Data;
   videoSrc: string;
+  videoRef: React.RefObject<HTMLVideoElement>;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -191,7 +195,7 @@ const SearchCard = ({
       </h2>
       <div className="w-full h-100 bg-[#F1F0FF] rounded-lg mt-4">
         {videoSrc ? (
-          <video controls loop className="w-full h-full">
+          <video ref={videoRef} loop className="w-full h-full">
             <source src={videoSrc} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -241,6 +245,9 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
   const [blindVideoSrc, setBlindVideoSrc] = useState<string>();
   const [heuristicVideoSrc, setHeuristicVideoSrc] = useState<string>();
 
+  const blindVideoRef = useRef<HTMLVideoElement>(null!);
+  const heuristicVideoRef = useRef<HTMLVideoElement>(null!);
+
   const fetchData = useCallback(async () => {
     try {
       const [blindRes, heuristicRes, blindVideoRes, heuristicVideoRes] =
@@ -280,6 +287,11 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       fetchData();
     }
   }, [origin, destination, fetchData]);
+
+  const handleStartAnimation = () => {
+    if (blindVideoRef.current) blindVideoRef.current.play();
+    if (heuristicVideoRef.current) heuristicVideoRef.current.play();
+  };
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <div className="w-full bg-[#F1F0FF]  relative">
@@ -302,6 +314,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
             title="Blind Search"
             data={blindData}
             videoSrc={heuristicVideoSrc || ""}
+            videoRef={heuristicVideoRef}
           />
         )}
         <div className="w-px my-3 bg-[#708C82]"></div>
@@ -310,11 +323,15 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
             title="Heuristic Search"
             data={heuristicData}
             videoSrc={blindVideoSrc || ""}
+            videoRef={blindVideoRef}
           />
         )}
       </div>
       <div className="w-full flex justify-center">
-        <button className="w-100 cursor-pointer flex justify-center gap-5 bg-[#F5C2C2] text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10">
+        <button
+          className="w-100 cursor-pointer flex justify-center gap-5 bg-[#F5C2C2] text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10"
+          onClick={handleStartAnimation}
+        >
           <Image src="/assets/start.svg" width={15} height={20} alt="start" />
           Start Animation
         </button>

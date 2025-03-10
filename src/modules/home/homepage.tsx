@@ -35,27 +35,50 @@ const Homepage = () => {
     }
 
     setLoading(true);
-
     toast.loading("Generating data, please wait...", {
       style: { fontSize: "18px" },
     });
 
     try {
-      axiosInstance.get(
+      await axiosInstance.get(
         `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
       );
-      axiosInstance.get(
+      await axiosInstance.get(
         `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
       );
 
-      toast.success("Data generated successfully!", {
-        style: { fontSize: "18px" },
-      });
-      toast.dismiss();
+      let retries = 0;
+      const maxRetries = 20;
+      const checkVideoExists = async () => {
+        try {
+          const heuristicResponse = await axiosInstance.get(
+            `/video/heuristic?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+          );
 
-      router.push(
-        `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
-      );
+          const blindResponse = await axiosInstance.get(
+            `/video/blind?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+          );
+
+          return !heuristicResponse.data.error && !blindResponse.data.error;
+        } catch (error) {
+          console.error("Error checking video:", error);
+          return false;
+        }
+      };
+      const interval = setInterval(async () => {
+        const isReady = await checkVideoExists();
+        if (isReady || retries >= maxRetries) {
+          clearInterval(interval);
+          toast.success("Data generated successfully!", {
+            style: { fontSize: "18px" },
+          });
+          toast.dismiss();
+          router.push(
+            `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
+          );
+        }
+        retries++;
+      }, 2000);
     } catch (error) {
       toast.dismiss();
       toast.error("Failed to generate data.");
@@ -109,7 +132,7 @@ const Homepage = () => {
         <button
           onClick={searchSubmit}
           className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
+            loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
           }`}
           disabled={loading}
         >
