@@ -263,14 +263,14 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
       const [blindRes, heuristicRes, blindVideoRes, heuristicVideoRes] =
         await Promise.all([
-          axiosInstance.get(`/blind/?start=${origin}&goal=${destination}`),
-          axiosInstance.get(`/heuristic/?start=${origin}&goal=${destination}`),
+          axiosInstance.get(`/blind?start=${origin}&goal=${destination}`),
+          axiosInstance.get(`/heuristic?start=${origin}&goal=${destination}`),
           axiosInstance.get(
-            `/video/blind/?start=${origin}&goal=${destination}`,
+            `/video/blind?start=${origin}&goal=${destination}`,
             { responseType: "blob" }
           ),
           axiosInstance.get(
-            `/video/heuristic/?start=${origin}&goal=${destination}`,
+            `/video/heuristic?start=${origin}&goal=${destination}`,
             { responseType: "blob" }
           ),
         ]);
@@ -361,10 +361,10 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
     try {
       const [blindVideoRes, heuristicVideoRes] = await Promise.all([
-        axiosInstance.get(`/video/blind/?start=${origin}&goal=${destination}`, {
+        axiosInstance.get(`/video/blind?start=${origin}&goal=${destination}`, {
           responseType: "blob",
         }),
-        axiosInstance.get(`/video/heuristic/?start=${origin}&goal=${destination}`, {
+        axiosInstance.get(`/video/heuristic?start=${origin}&goal=${destination}`, {
           responseType: "blob",
         }),
       ]);
