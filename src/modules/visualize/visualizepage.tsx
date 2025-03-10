@@ -305,7 +305,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
     } catch (err) {
       console.error("Error fetching data:", err);
     }
-  }, [origin, destination]);
+  }, [origin, destination,isBlindVideoReady,isHeuristicVideoReady]);
 
 
 
@@ -338,30 +338,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
   };
 
 
-  useEffect(() => {
-    if (origin && destination) {
-      fetchData();
-
-    }
-
-  }, [origin, destination, fetchData]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("Checking if videos are ready...");
-
-      if (isBlindVideoReady && isHeuristicVideoReady) {
-        console.log("Both videos are ready. Stopping interval.");
-        clearInterval(interval); // Stop interval when both are ready
-      }
-      else {
-        reloadAnimation()
-      }
-    }, 5000); // Check every 5 seconds
-
-    return () => clearInterval(interval); // Cleanup when component unmounts
-  }, [isBlindVideoReady, isHeuristicVideoReady]); // Dependency array
-
+  
   const reloadAnimation = async () => {
     setIsReloading(true);
     setIsPlaying(false);
@@ -434,6 +411,31 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
     if (blindVideoRef.current) blindVideoRef.current.play();
     if (heuristicVideoRef.current) heuristicVideoRef.current.play();
   };
+
+  useEffect(() => {
+    if (origin && destination) {
+      fetchData();
+
+    }
+
+  }, [origin, destination, fetchData]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Checking if videos are ready...");
+
+      if (isBlindVideoReady && isHeuristicVideoReady) {
+        console.log("Both videos are ready. Stopping interval.");
+        clearInterval(interval); // Stop interval when both are ready
+      }
+      else {
+        reloadAnimation()
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, [isBlindVideoReady, isHeuristicVideoReady,reloadAnimation]); // Dependency array
+
 
 
   return (

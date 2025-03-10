@@ -154,21 +154,21 @@ const Homepage = () => {
           initialPositionX={200}
           initialPositionY={100}
         >
-          {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-            < >
-              <div className="absolute left-1/2 top-6 transform -translate-x-1/2">
-                <TransformComponent>
-                  <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
-                </TransformComponent>
-              </div>
 
-              <div className="absolute right-20 top-20 ">
-                <Controls />
+          < >
+            <div className="absolute left-1/2 top-6 transform -translate-x-1/2">
+              <TransformComponent>
+                <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
+              </TransformComponent>
+            </div>
 
-              </div>
-            </>
+            <div className="absolute right-20 top-20 ">
+              <Controls />
 
-          )}
+            </div>
+          </>
+
+
         </TransformWrapper>
       </div>
     </div>
