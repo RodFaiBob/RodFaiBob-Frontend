@@ -8,7 +8,6 @@ import axiosInstance from "@/utils/Axios";
 import stations from "@/constant/stations";
 import { toast } from "react-hot-toast";
 
-
 const InterchangePoint = ({
   stnName,
   stnCode,
@@ -139,35 +138,41 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
               </div>
               <div className="flex flex-col ml-3 mt-2  gap-2">
                 <div className="font-semibold text-lg">Interchange</div>
-                {stnPath.length % 2 === 0
+                {(stnPath.length % 2 === 0
                   ? stnPath.slice(1, -1)
-                  : stnPath.slice(1).map((stn, index, arr) => {
-                      if (index % 2 !== 0) return null;
+                  : stnPath.slice(1)
+                ).map((stn, index, arr) => {
+                  if (index % 2 !== 0) return null;
 
-                      const nextStn = arr[index + 1];
-                      if (!nextStn) return null;
+                  const nextStn = arr[index + 1];
+                  if (!nextStn) return null;
 
-                      return (
-                        <div
-                          key={`${stn.stnCode}-${nextStn.stnCode}`}
-                          className="flex flex-col gap-2"
-                        >
-                          <div className="flex items-center gap-2">
-                            <InterchangePoint
-                              stnName={stn.stnName}
-                              stnCode={stn.stnCode}
-                              colorCode={stn.colorCode}
-                            />
-                            <span className="pb-1">→</span>
-                            <InterchangePoint
-                              stnName={nextStn.stnName}
-                              stnCode={nextStn.stnCode}
-                              colorCode={nextStn.colorCode}
-                            />
-                          </div>
+                  return (
+                    <div
+                      key={`${stn.stnCode}-${nextStn.stnCode}`}
+                      className="flex flex-col gap-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <InterchangePoint
+                            stnName={stn.stnName}
+                            stnCode={stn.stnCode}
+                            colorCode={stn.colorCode}
+                          />
                         </div>
-                      );
-                    })}
+
+                        <span className="pb-1">→</span>
+                        <div>
+                          <InterchangePoint
+                            stnName={nextStn.stnName}
+                            stnCode={nextStn.stnCode}
+                            colorCode={nextStn.colorCode}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -257,12 +262,8 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
   const [isReloading, setIsReloading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-
-
-
   const fetchData = useCallback(async () => {
     try {
-
       const [blindRes, heuristicRes, blindVideoRes, heuristicVideoRes] =
         await Promise.all([
           axiosInstance.get(`/blind?start=${origin}&goal=${destination}`),
@@ -279,7 +280,6 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
 
       setBlindData(blindRes.data);
       setHeuristicData(heuristicRes.data);
-
 
       try {
         const blindVideoURL = await createVideoURL(blindVideoRes.data);
@@ -303,17 +303,16 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         toast.dismiss();
         toast.success("Animation reloaded successfully!");
       }
-
     } catch (err) {
       console.error("Error fetching data:", err);
     }
-  }, [origin, destination,isBlindVideoReady,isHeuristicVideoReady]);
-
-
+  }, [origin, destination, isBlindVideoReady, isHeuristicVideoReady]);
 
   const createVideoURL = (blobData: BlobPart) => {
     return new Promise<string>((resolve, reject) => {
-      const blobURL = URL.createObjectURL(new Blob([blobData], { type: "video/mp4" }));
+      const blobURL = URL.createObjectURL(
+        new Blob([blobData], { type: "video/mp4" })
+      );
       const video = document.createElement("video");
 
       video.preload = "metadata"; // Load metadata without fully loading the video
@@ -324,8 +323,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       };
 
       video.onerror = () => {
-        
-        reject( new Error("Video cannot be played"));
+        reject(new Error("Video cannot be played"));
       };
 
       // Load the video by appending it to the DOM temporarily (avoiding issues with memory leaks)
@@ -339,8 +337,6 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
     });
   };
 
-
-  
   const reloadAnimation = async () => {
     setIsReloading(true);
     setIsPlaying(false);
@@ -355,17 +351,18 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       heuristicVideoRef.current.currentTime = 0; // Reset to beginning
     }
 
-
     try {
       const [blindVideoRes, heuristicVideoRes] = await Promise.all([
         axiosInstance.get(`/video/blind?start=${origin}&goal=${destination}`, {
           responseType: "blob",
         }),
-        axiosInstance.get(`/video/heuristic?start=${origin}&goal=${destination}`, {
-          responseType: "blob",
-        }),
+        axiosInstance.get(
+          `/video/heuristic?start=${origin}&goal=${destination}`,
+          {
+            responseType: "blob",
+          }
+        ),
       ]);
-
 
       try {
         const heuristicVideoURL = await createVideoURL(heuristicVideoRes.data);
@@ -376,8 +373,6 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         console.error("Heuristic video failed to load:", error);
       }
 
-
-
       try {
         const blindVideoURL = await createVideoURL(blindVideoRes.data);
         setBlindVideoSrc(blindVideoURL);
@@ -387,8 +382,6 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         console.error("Blind video failed to load:", error);
       }
 
-      
-      
       if (isBlindVideoReady && isHeuristicVideoReady) {
         toast.dismiss();
         toast.success("Animation reloaded successfully!");
@@ -417,9 +410,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
   useEffect(() => {
     if (origin && destination) {
       fetchData();
-
     }
-
   }, [origin, destination, fetchData]);
 
   useEffect(() => {
@@ -429,16 +420,13 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
       if (isBlindVideoReady && isHeuristicVideoReady) {
         console.log("Both videos are ready. Stopping interval.");
         clearInterval(interval); // Stop interval when both are ready
-      }
-      else {
-        reloadAnimation()
+      } else {
+        reloadAnimation();
       }
     }, 5000); // Check every 5 seconds
 
     return () => clearInterval(interval); // Cleanup when component unmounts
-  }, [isBlindVideoReady, isHeuristicVideoReady,reloadAnimation]); // Dependency array
-
-
+  }, [isBlindVideoReady, isHeuristicVideoReady, reloadAnimation]); // Dependency array
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -463,7 +451,6 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
             data={blindData}
             videoSrc={blindVideoSrc || ""}
             videoRef={blindVideoRef}
-
           />
         )}
         <div className="w-px my-3 bg-[#708C82]"></div>
@@ -473,28 +460,34 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
             data={heuristicData}
             videoSrc={heuristicVideoSrc || ""}
             videoRef={heuristicVideoRef}
-
           />
         )}
       </div>
       <div className="w-full flex justify-center gap-5">
         <button
-          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${isReloading ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff9292]"
-            }`}
+          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${
+            isReloading ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff9292]"
+          }`}
           onClick={reloadAnimation}
           disabled={isReloading}
         >
-          <Image src="/assets/reload-white.svg" width={25} height={20} alt="reload" />
+          <Image
+            src="/assets/reload-white.svg"
+            width={25}
+            height={20}
+            alt="reload"
+          />
           {isReloading ? "Reloading..." : "Reload Animation"}
         </button>
 
         <button
-          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${!isBlindVideoReady || !isHeuristicVideoReady || isReloading
-            ? "bg-gray-400 cursor-not-allowed"
-            : isPlaying
+          className={`w-100 cursor-pointer flex justify-center gap-5 text-white font-semibold text-2xl py-3 rounded-2xl mt-4 mb-10 ${
+            !isBlindVideoReady || !isHeuristicVideoReady || isReloading
+              ? "bg-gray-400 cursor-not-allowed"
+              : isPlaying
               ? "bg-green-500"
               : "bg-[#ff9292]"
-            }`}
+          }`}
           onClick={handleStartAnimation}
           disabled={!isBlindVideoReady || !isHeuristicVideoReady || isReloading}
         >
