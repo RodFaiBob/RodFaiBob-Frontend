@@ -148,7 +148,7 @@ const Homepage = () => {
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      <div className="relative w-full  ">
+      <div className="relative w-full ">
         <TransformWrapper
           initialScale={1}
           initialPositionX={200}
@@ -156,7 +156,7 @@ const Homepage = () => {
         >
 
           < >
-            <div className="absolute left-1/2 top-6 transform -translate-x-1/2">
+            <div className="absolute left-1/2 top-24 transform -translate-x-1/2">
               <TransformComponent>
                 <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
               </TransformComponent>
