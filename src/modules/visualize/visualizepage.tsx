@@ -286,7 +286,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setBlindVideoSrc(blindVideoURL);
         setIsBlindVideoReady(true);
       } catch (error) {
-        toast.error("Blind video failed to load");
+        toast.error("Blind video is generating...");
         console.error("Blind video failed to load:", error);
       }
 
@@ -295,7 +295,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setHeuristicVideoSrc(heuristicVideoURL);
         setIsHeuristicVideoReady(true);
       } catch (error) {
-        toast.error("Heuristic video failed to load");
+        toast.error("Heuristic video is generating...");
         console.error("Heuristic video failed to load:", error);
       }
 
@@ -369,7 +369,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setHeuristicVideoSrc(heuristicVideoURL);
         setIsHeuristicVideoReady(true);
       } catch (error) {
-        toast.error("Heuristic video failed to load");
+        toast.error("Heuristic video is generating...");
         console.error("Heuristic video failed to load:", error);
       }
 
@@ -378,7 +378,7 @@ const VisualizePage = ({ origin, destination }: VisualizePageProps) => {
         setBlindVideoSrc(blindVideoURL);
         setIsBlindVideoReady(true);
       } catch (error) {
-        toast.error("Blind video failed to load");
+        toast.error("Blind video is generating...");
         console.error("Blind video failed to load:", error);
       }
 
