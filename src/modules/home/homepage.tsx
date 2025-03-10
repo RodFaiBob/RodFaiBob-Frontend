@@ -5,10 +5,54 @@ import React from "react";
 import { useState } from "react";
 import { StationType } from "./types";
 import { toast } from "react-hot-toast";
-
+import axiosInstance from "@/utils/Axios";
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/utils/Axios";
+
+import {
+  TransformWrapper,
+  TransformComponent,
+  useControls,
+} from "react-zoom-pan-pinch";
+
+const Controls = () => {
+  const { zoomIn, zoomOut } = useControls();
+
+  return (
+    <div className="flex flex-col items-center gap-4 w-fit ">
+      <div
+        onClick={() => zoomIn()}
+        className="cursor-pointer flex  w-full "
+      >
+        <Image
+          src="/assets/home/zoomin.png"
+          alt="zoomin"
+          width={48}
+          height={48}
+        />
+      </div>
+      <div
+        onClick={() => zoomOut()}
+        className="cursor-pointer flex  w-full"
+      >
+        <Image
+          src="/assets/home/zoomout.png"
+          alt="zoomout"
+          width={48}
+          height={48}
+        />
+      </div>
+    </div>
+  );
+};
+
+
+// const mockData = [
+//   {
+//     label: "test",
+//     value: "test1"
+
+//   }]
 
 const Homepage = () => {
   const router = useRouter();
@@ -16,7 +60,6 @@ const Homepage = () => {
   const [originStation, setOriginStation] = useState<StationType | null>(null);
   const [destinationStation, setDestinationStation] =
     useState<StationType | null>(null);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSwitch = () => {
@@ -24,9 +67,6 @@ const Homepage = () => {
     setDestinationStation(originStation);
   };
 
-  const toggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
-  };
 
   const searchSubmit = async () => {
     if (!originStation || !destinationStation) {
@@ -35,50 +75,20 @@ const Homepage = () => {
     }
 
     setLoading(true);
-    toast.loading("Generating data, please wait...", {
-      style: { fontSize: "18px" },
-    });
+
 
     try {
-      await axiosInstance.get(
+      axiosInstance.get(
         `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
       );
-      await axiosInstance.get(
+      axiosInstance.get(
         `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
       );
 
-      let retries = 0;
-      const maxRetries = 20;
-      const checkVideoExists = async () => {
-        try {
-          const heuristicResponse = await axiosInstance.get(
-            `/video/heuristic?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-          );
 
-          const blindResponse = await axiosInstance.get(
-            `/video/blind?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
-          );
-
-          return !heuristicResponse.data.error && !blindResponse.data.error;
-        } catch (error) {
-          console.error("Error checking video:", error);
-          return false;
-        }
-      };
-      const interval = setInterval(async () => {
-        const isReady = await checkVideoExists();
-        if (isReady || retries >= maxRetries) {
-          clearInterval(interval);
-          toast.success("Data generated successfully!", {
-            style: { fontSize: "18px" },
-          });
-          toast.dismiss();
-          router.push(
-            `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
-          );
-        }
-        retries++;
-      }, 2000);
+      router.push(
+        `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
+      );
     } catch (error) {
       toast.dismiss();
       toast.error("Failed to generate data.");
@@ -131,27 +141,35 @@ const Homepage = () => {
         </div>
         <button
           onClick={searchSubmit}
-          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${
-            loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-          }`}
+          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
           disabled={loading}
         >
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      <div
-        className={`w-full ${
-          isFullScreen
-            ? "fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center"
-            : "h-[1100px] flex items-center justify-center"
-        }`}
-        onClick={toggleFullScreen}
-      >
-        <Image
-          src={TrainMap}
-          alt="TrainMap"
-          className={isFullScreen ? "w-full h-full object-contain" : ""}
-        />
+      <div className="relative w-full ">
+        <TransformWrapper
+          initialScale={1}
+          initialPositionX={200}
+          initialPositionY={100}
+        >
+
+          < >
+            <div className="absolute left-1/2 top-24 transform -translate-x-1/2">
+              <TransformComponent>
+                <Image src={TrainMap} alt="map" className="w-full min-h-sc min-w-[40vw]" />
+              </TransformComponent>
+            </div>
+
+            <div className="absolute right-20 top-20 ">
+              <Controls />
+
+            </div>
+          </>
+
+
+        </TransformWrapper>
       </div>
     </div>
   );
