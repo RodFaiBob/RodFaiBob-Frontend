@@ -114,15 +114,15 @@ const Homepage = () => {
           Search
         </button>
       </div>
-      <div className="relative w-full ">
+      <div className="relative w-full h-[134vh]">
         <TransformWrapper
           initialScale={1}
           initialPositionX={200}
           initialPositionY={100}
         >
           {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-            <div className="relative">
-              <div className="absolute left-[18.5%] top-5 ">
+            < >
+              <div className="absolute left-[18.5%] top-6 ">
                 <TransformComponent>
                   <Image src={TrainMap} alt="map" className="w-full h-auto" />
                 </TransformComponent>
@@ -131,7 +131,7 @@ const Homepage = () => {
                 <Controls />
 
               </div>
-            </div>
+            </>
  
           )}
         </TransformWrapper>
