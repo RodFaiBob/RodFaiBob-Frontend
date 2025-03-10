@@ -169,7 +169,7 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
               </div>
             </div>
           </div>
-          <button className="w-full bg-[#F5C2C2] text-[20px] font-bold  py-2 rounded-2xl mt-2">
+          <button className="w-full bg-[#f49595] text-[20px] font-bold  py-2 rounded-2xl mt-2">
             <span className="font-semibold">Fare</span> : {data.cost} Bath
           </button>
         </div>
