@@ -137,33 +137,35 @@ const Modal = ({ onClose, data }: { onClose: () => void; data: Data }) => {
               </div>
               <div className="flex flex-col ml-3 mt-2  gap-2">
                 <div className="font-semibold text-lg">Interchange</div>
-                {stnPath.slice(1, -1).map((stn, index, arr) => {
-                  if (index % 2 !== 0) return null;
+                {stnPath.length % 2 === 0
+                  ? stnPath.slice(1, -1)
+                  : stnPath.slice(1).map((stn, index, arr) => {
+                      if (index % 2 !== 0) return null;
 
-                  const nextStn = arr[index + 1];
-                  if (!nextStn) return null;
+                      const nextStn = arr[index + 1];
+                      if (!nextStn) return null;
 
-                  return (
-                    <div
-                      key={`${stn.stnCode}-${nextStn.stnCode}`}
-                      className="flex flex-col gap-2"
-                    >
-                      <div className="flex items-center gap-2">
-                        <InterchangePoint
-                          stnName={stn.stnName}
-                          stnCode={stn.stnCode}
-                          colorCode={stn.colorCode}
-                        />
-                        <span className="pb-1">→</span>
-                        <InterchangePoint
-                          stnName={nextStn.stnName}
-                          stnCode={nextStn.stnCode}
-                          colorCode={nextStn.colorCode}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                      return (
+                        <div
+                          key={`${stn.stnCode}-${nextStn.stnCode}`}
+                          className="flex flex-col gap-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <InterchangePoint
+                              stnName={stn.stnName}
+                              stnCode={stn.stnCode}
+                              colorCode={stn.colorCode}
+                            />
+                            <span className="pb-1">→</span>
+                            <InterchangePoint
+                              stnName={nextStn.stnName}
+                              stnCode={nextStn.stnCode}
+                              colorCode={nextStn.colorCode}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
               </div>
             </div>
           </div>
