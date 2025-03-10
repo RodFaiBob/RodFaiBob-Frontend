@@ -6,7 +6,15 @@ const axiosInstance = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 
+axiosInstance.interceptors.request.use((config) => {
+    if (config.url?.startsWith("http://")) {
+      config.url = config.url.replace("http://", "https://");
+    }
+    return config;
+  });
 
+
+  
 axiosInstance.interceptors.request.use(request => {
     console.log('Starting Request', request);
     return request;
