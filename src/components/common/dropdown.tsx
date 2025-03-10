@@ -1,12 +1,14 @@
 'use client'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import { StationType } from '../../modules/home/types';
+import { StationType } from '@/modules/home/types';
+import stations from '@/constant/stations';
 
 type LineType = {
   colorCode: string;
   lineNameThai: string;
   lineNameEng: string;
+  lineKey: string;
 };
 
 type LineProps = LineType & {
@@ -36,16 +38,17 @@ const Line = ({ colorCode, lineNameThai, lineNameEng, onClick, showDropdown = fa
 
 const LineList = ({ onSelectLine }: { onSelectLine: (line: LineType) => void }) => {
   const lines = [
-    { colorCode: "#8CB63C", lineNameThai: "สายสุขุมวิท (สายสีเขียว)", lineNameEng: "Sukhumvit Line (Green Line)" },
-    { colorCode: "#42807D", lineNameThai: "สายสีลม (สายสีเขียว)", lineNameEng: "Silom Line (Green Line)" },
-    { colorCode: "#A38B2B", lineNameThai: "สายสีทอง", lineNameEng: "Gold Line" },
-    { colorCode: "#CA6184", lineNameThai: "สายสีชมพู", lineNameEng: "MRT Pink Line" },
-    { colorCode: "#F5D411", lineNameThai: "สายสีเหลือง", lineNameEng: "MRT Yellow Line" },
-    { colorCode: "#2C347D", lineNameThai: "สายสีน้ำเงิน", lineNameEng: "MRT Blue Line" },
-    { colorCode: "#7C3683", lineNameThai: "สายสีม่วง", lineNameEng: "MRT Purple Line" },
-    { colorCode: "#641D35", lineNameThai: "แอร์พอร์ต เรล ลิงก์", lineNameEng: "ARL Airport Rail Link" },
-    { colorCode: "#991A17", lineNameThai: "สายสีแดง", lineNameEng: "Red LineCommuter Train" },
+    { colorCode: "#8CB63C", lineKey: "sukhumvit", lineNameThai: "สายสุขุมวิท (สายสีเขียว)", lineNameEng: "Sukhumvit Line (Green Line)" },
+    { colorCode: "#42807D", lineKey: "silom", lineNameThai: "สายสีลม (สายสีเขียว)", lineNameEng: "Silom Line (Green Line)" },
+    { colorCode: "#A38B2B", lineKey: "gold", lineNameThai: "สายสีทอง", lineNameEng: "Gold Line" },
+    { colorCode: "#CA6184", lineKey: "pink", lineNameThai: "สายสีชมพู", lineNameEng: "MRT Pink Line" },
+    { colorCode: "#F5D411", lineKey: "yellow", lineNameThai: "สายสีเหลือง", lineNameEng: "MRT Yellow Line" },
+    { colorCode: "#2C347D", lineKey: "blue", lineNameThai: "สายสีน้ำเงิน", lineNameEng: "MRT Blue Line" },
+    { colorCode: "#7C3683", lineKey: "purple", lineNameThai: "สายสีม่วง", lineNameEng: "MRT Purple Line" },
+    { colorCode: "#641D35", lineKey: "airlink", lineNameThai: "แอร์พอร์ต เรล ลิงก์", lineNameEng: "ARL Airport Rail Link" },
+    { colorCode: "#991A17", lineKey: "red", lineNameThai: "สายสีแดง", lineNameEng: "Red Line Commuter Train" },
   ];
+  
   return (
     <div className="flex flex-col items-center overflow-y-scroll h-60 w-85 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
       {lines.map((line, index) => (
@@ -54,6 +57,7 @@ const LineList = ({ onSelectLine }: { onSelectLine: (line: LineType) => void }) 
           colorCode={line.colorCode}
           lineNameThai={line.lineNameThai}
           lineNameEng={line.lineNameEng}
+          lineKey={line.lineKey}
           onClick={() => onSelectLine(line)}
         />
       ))}
@@ -90,12 +94,8 @@ const StationList = ({ line, onSelectLine, setSelectedStation,setIsOpen}
     setSelectedStation: (station: StationType) => void;
     setIsOpen: (isOpen: boolean) => void;
    }) => {
-  const mock_stations = [
-    { stnName: "คูคต", stnCode: "N24", colorCode: "#8CB63C" },
-    { stnName: "แยก คปอ.", stnCode: "N23", colorCode: "#8CB63C" },
-    { stnName: "พิพิธภัณฑ์กองทัพอากาศ", stnCode: "N22", colorCode: "#8CB63C" },
-    { stnName: "โรงพยาบาลภูมิพลดุลยเดช", stnCode: "N21", colorCode: "#8CB63C" },
-  ];
+
+    const currentStations = stations[line.lineKey as keyof typeof stations] || [];
 
   return (
     <div className="flex flex-col items-center h-60 w-85 border-2 border-[#708C82] rounded-[15px] bg-[#F8F7FF]">
@@ -104,10 +104,11 @@ const StationList = ({ line, onSelectLine, setSelectedStation,setIsOpen}
         lineNameThai={line.lineNameThai}
         lineNameEng={line.lineNameEng}
         onClick={onSelectLine}
-        showDropdown={true}></Line>
+        showDropdown={true} 
+        lineKey={line.lineKey}></Line>
       <div className="w-75 h-[2px] bg-[#CDCDCD]"></div>
       <div className='flex flex-col items-center overflow-y-scroll h-fit w-full '>
-        {mock_stations.map((station, index) => (
+        {currentStations.map((station, index) => (
           <StationPoint
             key={index}
             stnName={station.stnName}

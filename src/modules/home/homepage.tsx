@@ -4,7 +4,8 @@ import Image from "next/image";
 import React from "react";
 import { useState } from "react";
 import { StationType } from "./types";
-
+import { toast } from "react-hot-toast";
+import axiosInstance from "@/utils/Axios";
 import TrainMap from "@/../public/trainmap.svg";
 import { useRouter } from "next/navigation";
 
@@ -59,12 +60,43 @@ const Homepage = () => {
   const [originStation, setOriginStation] = useState<StationType | null>(null);
   const [destinationStation, setDestinationStation] =
     useState<StationType | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSwitch = () => {
     setOriginStation(destinationStation);
     setDestinationStation(originStation);
   };
 
+
+  const searchSubmit = async () => {
+    if (!originStation || !destinationStation) {
+      toast.error("Please select both origin and destination stations.");
+      return;
+    }
+
+    setLoading(true);
+
+    
+    try {
+      axiosInstance.get(
+        `/video/heuristic/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
+      axiosInstance.get(
+        `/video/blind/gen?start=${originStation.stnCode}&goal=${destinationStation.stnCode}`
+      );
+
+
+      router.push(
+        `/visualize/${originStation.stnCode}/${destinationStation.stnCode}`
+      );
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to generate data.");
+      console.error("API request failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full">
@@ -108,10 +140,12 @@ const Homepage = () => {
           />
         </div>
         <button
-          className="p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-bold text-[#F8F7FF] tracking-wider hover:bg-[#588474] cursor-pointer"
-          onClick={() => router.push(`/visualize`)}
+          onClick={searchSubmit}
+          className={`p-1.75 pl-12 pr-12 bg-[#708C82] rounded-[15px] text-2xl font-medium text-white ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
+          disabled={loading}
         >
-          Search
+          {loading ? "Loading..." : "Search"}
         </button>
       </div>
       <div className="relative w-full h-[134vh]">
